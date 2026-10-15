@@ -29,6 +29,15 @@ inputs:
   usage:
     description: Optional JSON usage forecast keyed by Terraform resource address.
     default: ''
+  github-pr:
+    description: Optional positive PR number. Explicitly enables report comment creation/update and requires GITHUB_TOKEN in the environment.
+    default: ''
+  github-repository:
+    description: Repository owner/name for an enabled PR report. Defaults to GITHUB_REPOSITORY.
+    default: ''
+  github-author:
+    description: Login that owns the report comment. Override for a custom GitHub App or personal access token.
+    default: 'github-actions[bot]'
   license:
     description: Legacy license input. Prefer the CLOUDGUARD_LICENSE_KEY secret environment variable.
     default: ''
@@ -70,6 +79,9 @@ runs:
         CLOUDGUARD_CATALOG_SHA256: ${{ inputs.catalog-sha256 }}
         CLOUDGUARD_CONFIG: ${{ inputs.config }}
         CLOUDGUARD_USAGE: ${{ inputs.usage }}
+        CLOUDGUARD_GITHUB_PR: ${{ inputs.github-pr }}
+        CLOUDGUARD_GITHUB_REPOSITORY: ${{ inputs.github-repository }}
+        CLOUDGUARD_GITHUB_AUTHOR: ${{ inputs.github-author }}
         CLOUDGUARD_LEGACY_LICENSE_INPUT: ${{ inputs.license }}
         CLOUDGUARD_SOURCE_ROOT: ${{ inputs.root }}
         CLOUDGUARD_REPORT: ${{ inputs.report }}
