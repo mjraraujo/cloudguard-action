@@ -1,0 +1,84 @@
+name: CloudGuard FinOps
+description: Evaluate Terraform/OpenTofu PR cost gates locally using a verified prebuilt CloudGuard release.
+author: CloudGuard FinOps
+branding:
+  icon: shield
+  color: blue
+inputs:
+  version:
+    description: Exact published binary tag, for example v1.2.3. Mutable latest and major-only tags are rejected.
+    required: true
+  archive-sha256:
+    description: Optional independently trusted SHA256 of the platform release archive.
+    default: ''
+  plan:
+    description: Path to terraform show -json output.
+    required: true
+  catalog:
+    description: Local pricing database path, also used for a verified catalog download.
+    default: pricing.db
+  catalog-url:
+    description: Optional URL of a separately versioned catalog. Requires catalog-sha256.
+    default: ''
+  catalog-sha256:
+    description: Independently trusted SHA256 of catalog-url contents.
+    default: ''
+  config:
+    description: Policy configuration path.
+    default: .cloudguard.yaml
+  usage:
+    description: Optional JSON usage forecast keyed by Terraform resource address.
+    default: ''
+  license:
+    description: Legacy license input. Prefer the CLOUDGUARD_LICENSE_KEY secret environment variable.
+    default: ''
+  root:
+    description: Terraform source root for report locations.
+    default: .
+  report:
+    description: Markdown report output path.
+    default: cloudguard-report.md
+outputs:
+  report:
+    description: Generated report path.
+    value: ${{ inputs.report }}
+runs:
+  using: composite
+  steps:
+    - id: install
+      shell: python
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        CLOUDGUARD_VERSION: ${{ inputs.version }}
+        CLOUDGUARD_ARCHIVE_SHA256: ${{ inputs.archive-sha256 }}
+      run: |
+        import os
+        from pathlib import Path
+        import subprocess
+        import sys
+        scripts = Path(os.environ["ACTION_PATH"]) / "scripts"
+        if not (scripts / "install.py").is_file():
+            scripts = Path(os.environ["ACTION_PATH"]) / "distribution" / "cloudguard-action" / "scripts"
+        subprocess.run([sys.executable, str(scripts / "install.py")], check=True)
+    - shell: python
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+        CLOUDGUARD_EXECUTABLE: ${{ steps.install.outputs.executable }}
+        CLOUDGUARD_PLAN: ${{ inputs.plan }}
+        CLOUDGUARD_CATALOG: ${{ inputs.catalog }}
+        CLOUDGUARD_CATALOG_URL: ${{ inputs.catalog-url }}
+        CLOUDGUARD_CATALOG_SHA256: ${{ inputs.catalog-sha256 }}
+        CLOUDGUARD_CONFIG: ${{ inputs.config }}
+        CLOUDGUARD_USAGE: ${{ inputs.usage }}
+        CLOUDGUARD_LEGACY_LICENSE_INPUT: ${{ inputs.license }}
+        CLOUDGUARD_SOURCE_ROOT: ${{ inputs.root }}
+        CLOUDGUARD_REPORT: ${{ inputs.report }}
+      run: |
+        import os
+        from pathlib import Path
+        import subprocess
+        import sys
+        scripts = Path(os.environ["ACTION_PATH"]) / "scripts"
+        if not (scripts / "run.py").is_file():
+            scripts = Path(os.environ["ACTION_PATH"]) / "distribution" / "cloudguard-action" / "scripts"
+        sys.exit(subprocess.run([sys.executable, str(scripts / "run.py")], check=False).returncode)

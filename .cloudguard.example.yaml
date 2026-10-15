@@ -1,0 +1,13 @@
+version: 1
+currency: EUR
+max_monthly_cost: 5000
+max_monthly_delta: 250
+max_percent_delta: 20
+# Cost gates require Pro or Enterprise. Free produces cost reports.
+# Custom tags and optimization policies require Enterprise.
+required_tags: []
+deny_incomplete: true
+deny_drift: false
+finops:
+  require_gp3: false
+  require_modern_instances: false
