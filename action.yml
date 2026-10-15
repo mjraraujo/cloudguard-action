@@ -42,8 +42,11 @@ inputs:
     description: Legacy license input. Prefer the CLOUDGUARD_LICENSE_KEY secret environment variable.
     default: ''
   root:
-    description: Terraform source root for report locations.
+    description: Terraform source root for report locations and verified provider regions. Dynamic regions require source-manifest.
     default: .
+  source-manifest:
+    description: Optional matching plan/source manifest captured by a compatible published CloudGuard CLI. Enables dynamic provider-region expressions.
+    default: ''
   report:
     description: Markdown report output path.
     default: cloudguard-report.md
@@ -84,6 +87,7 @@ runs:
         CLOUDGUARD_GITHUB_AUTHOR: ${{ inputs.github-author }}
         CLOUDGUARD_LEGACY_LICENSE_INPUT: ${{ inputs.license }}
         CLOUDGUARD_SOURCE_ROOT: ${{ inputs.root }}
+        CLOUDGUARD_SOURCE_MANIFEST: ${{ inputs.source-manifest }}
         CLOUDGUARD_REPORT: ${{ inputs.report }}
       run: |
         import os

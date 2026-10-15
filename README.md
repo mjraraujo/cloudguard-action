@@ -38,6 +38,14 @@ To fetch a catalog, replace the local-catalog setup with both `catalog-url` and 
 
 `usage` is optional for resources whose monthly usage is fully represented by Terraform. Supply forecasts for usage-dependent services such as S3 storage/GET/PUT, NAT data processing, and ALB LCU-hours. The usage file is a JSON object keyed by Terraform resource address; refer to the CLI documentation for supported fields. Omit `usage` from the example when no forecast file is needed.
 
+Optional `source-manifest` enables provider-region expressions from matching Terraform source. In the trusted plan-generation step, capture the matching plan and unchanged source using a published CLI version that supports this command and matches the action's `version`:
+
+```sh
+cloudguard source-manifest --plan plan.json --root infrastructure --output source-manifest.json
+```
+
+Pass `root: infrastructure` and `source-manifest: source-manifest.json` to the action. The manifest binds plan bytes and source hashes; capture is an operator assertion that they belong together. Changed sources or plan bytes are rejected. Without this input, unresolved provider expressions remain incomplete; evaluated resource locations still work. Unsupported expressions remain incomplete even with a manifest. Older CLI releases do not accept this optional flag.
+
 ## Optional PR report comment
 
 Set `github-pr` to explicitly create or update the marked report comment on a pull request. Posting stays disabled when this input is empty. Supply the token through the `GITHUB_TOKEN` environment variable and grant permission to write PR comments:
@@ -78,4 +86,4 @@ The action writes the Markdown report to `report` and exposes that path as its `
 
 ## Inputs
 
-`version` and `plan` are required. Optional inputs are `archive-sha256`, `catalog` (default `pricing.db`), `catalog-url` with `catalog-sha256`, `config` (default `.cloudguard.yaml`), `usage`, `github-pr`, `github-repository`, `github-author` (default `github-actions[bot]`), legacy `license`, `root` (default `.`), and `report` (default `cloudguard-report.md`).
+`version` and `plan` are required. Optional inputs are `archive-sha256`, `catalog` (default `pricing.db`), `catalog-url` with `catalog-sha256`, `config` (default `.cloudguard.yaml`), `usage`, `github-pr`, `github-repository`, `github-author` (default `github-actions[bot]`), legacy `license`, `root` (default `.`), `source-manifest` (empty by default), and `report` (default `cloudguard-report.md`).

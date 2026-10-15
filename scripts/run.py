@@ -17,6 +17,7 @@ def invocation(environment):
             "--output", environment.get("CLOUDGUARD_REPORT") or "cloudguard-report.md",
             "--root", environment.get("CLOUDGUARD_SOURCE_ROOT") or "."]
     optional = [("CLOUDGUARD_USAGE", "--usage"),
+                ("CLOUDGUARD_SOURCE_MANIFEST", "--source-manifest"),
                 ("CLOUDGUARD_CATALOG_URL", "--catalog-url"),
                 ("CLOUDGUARD_CATALOG_SHA256", "--catalog-sha256")]
     catalog_url = environment.get("CLOUDGUARD_CATALOG_URL", "")
